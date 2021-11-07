@@ -24,7 +24,7 @@ public class CallbackProducer {
 
         // 3. 发送数据 直接new 接口 就是匿名实现类的匿名对象
         for (int i = 0; i < 10; i++) {
-            kafkaProducer.send(new ProducerRecord<>("first", "atguigu--" + i), (metadata, exception) -> {
+            kafkaProducer.send(new ProducerRecord<>("first", 0, "atguigu", "atguigu--" + i), (metadata, exception) -> {
                 // 成功了返回的就是metadata 失败了返回的就是异常
                 // 新创建一个主题，发送消息，可以看到offset是从0开始计算的
                 if(exception == null) {
