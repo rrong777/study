@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author wql78
@@ -13,7 +14,7 @@ import java.util.Properties;
  * @date 2021-11-07 19:34:29
  */
 public class MyProducer {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         // 1. 先创建kafka生产者配置信息 你在命令行下 生产 也要--zookeeper --topic这些 在代码里面也要这些参数
         Properties props = new Properties();// properties 也是kv键值对形式的
         // 2. 指定连接的kafka集群，指定一个节点的地址即可，也可以指定多个，在命令行中是--broker-list
@@ -46,7 +47,11 @@ public class MyProducer {
 
         // 10. 发送数据
         for (int i = 0; i < 10; i++) {
-            producer.send(new ProducerRecord<>("first", "atguigu--" + i));
+            // 没有.get()的时候就是异步发送消息，有.get()的时候就变成同步了，因为send方法返回的是一个Future对象，这个对象的get方法会阻塞之前的一个
+            // 线程，这个同步是我们人为造成的，但是这种发送效率太低了。同步发送有一种特定场景会用到，kafka是分区内有序性，如果我想保证全局有序性
+            // 就需要用同步发送了。 异步发送，你就算只有一个分区都不能保证有序性，你先发123，再发456  456接收到了，123不好意思没接收到，再重新发送
+            // 没有顺序了
+            producer.send(new ProducerRecord<>("first", "atguigu--" + i)).get();
 
         }
         // 循环10次一毫秒都不需要， 如果你没有close方法，执行完了之后线程就结束了，根本不会发送消息
