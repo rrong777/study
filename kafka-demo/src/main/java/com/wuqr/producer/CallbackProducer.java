@@ -31,7 +31,7 @@ public class CallbackProducer {
         for (int i = 0; i < 10; i++) {
             // 分区号0之后的atguigu是消息的key
             // 如果不带分区号，就给一个key 是按照key的哈希值去算分区号
-            kafkaProducer.send(new ProducerRecord<>("first",  list.get(i % 3), "atguigu--" + i), (metadata, exception) -> {
+            kafkaProducer.send(new ProducerRecord<>("first",  "atguigu", "atguigu--" + i), (metadata, exception) -> {
                 // 成功了返回的就是metadata 失败了返回的就是异常
                 // 新创建一个主题，发送消息，可以看到offset是从0开始计算的
                 if(exception == null) {
